@@ -7,12 +7,12 @@ import socket
 app = Flask(__name__)
 CORS(app)
 
-# The root directory for the PixelCat animations
-# It assumes PixelCat folder is in the parent directory
-ANIMATION_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'PixelCat'))
+# The root directory for the kio_cat animations
+# It assumes kio_cat folder is in the parent directory
+ANIMATION_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'kio_cat'))
 
 def get_animations():
-    """Scans the PixelCat directory and returns a dictionary of animations and their frames."""
+    """Scans the kio_cat directory and returns a dictionary of animations and their frames."""
     animations = {}
     if not os.path.exists(ANIMATION_DIR):
         return animations
@@ -26,7 +26,8 @@ def get_animations():
             frames = [os.path.basename(f) for f in frames]
             frames.sort()
             if frames:
-                animations[entry] = frames
+                # Use lowercase for animation name so ESP32 matches it properly
+                animations[entry.lower()] = frames
                 
     return animations
 
