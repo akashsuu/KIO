@@ -1,0 +1,15 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.env
+venv/
+env/
+
+# PlatformIO
+.pio/
+.vscode/
+
+# OS generated files
+.DS_Store
+Thumbs.db
