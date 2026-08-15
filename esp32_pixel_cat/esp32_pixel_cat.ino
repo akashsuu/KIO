@@ -17,8 +17,8 @@ WiFiUDP ntpUDP;
 NTPClient timeClient(ntpUDP, "pool.ntp.org", UTC_OFFSET_SECONDS);
 
 // Animation State
-String currentState = "idle";
-String nextState = "idle";
+String currentState = "sit";
+String nextState = "sit";
 std::vector<String> currentFrames;
 int currentFrameIndex = 0;
 unsigned long lastFrameTime = 0;
@@ -131,9 +131,13 @@ void playNextFrame() {
         currentFrameIndex = 0;
         // Animation loop finished, transition to next state if requested
         if (currentState != nextState) {
-            currentState = nextState;
-            stateStartTime = millis();
-            downloadAnimation(currentState);
+            if (downloadAnimation(nextState)) {
+                currentState = nextState;
+                stateStartTime = millis();
+            } else {
+                // If the new animation doesn't exist on the server, fallback to current
+                nextState = currentState;
+            }
         }
     }
 }
