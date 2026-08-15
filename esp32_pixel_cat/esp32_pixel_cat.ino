@@ -2,14 +2,16 @@
 #include <WiFi.h>
 #include <HTTPClient.h>
 #include <LittleFS.h>
-#include <TFT_eSPI.h>
+#include <Adafruit_GFX.h>
+#include <Adafruit_ST7735.h>
+#include <SPI.h>
 #include <PNGdec.h>
 #include <ArduinoJson.h>
 #include <NTPClient.h>
 #include <WiFiUdp.h>
 #include "config.h"
 
-TFT_eSPI tft = TFT_eSPI();
+Adafruit_ST7735 tft = Adafruit_ST7735(TFT_CS, TFT_DC, TFT_RST);
 PNG png;
 WiFiUDP ntpUDP;
 NTPClient timeClient(ntpUDP, "pool.ntp.org", UTC_OFFSET_SECONDS);
@@ -32,9 +34,9 @@ int pngDraw(PNGDRAW *pDraw);
 void setup() {
     Serial.begin(115200);
     
-    tft.begin();
+    tft.initR(INITR_BLACKTAB); // Init ST7735S chip, black tab
     tft.setRotation(1); // Adjust rotation if needed (128x160 portrait/landscape)
-    tft.fillScreen(TFT_BLACK);
+    tft.fillScreen(ST77XX_BLACK);
     
     if (!LittleFS.begin(true)) {
         Serial.println("LittleFS Mount Failed");
@@ -42,15 +44,16 @@ void setup() {
     }
 
     WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
-    tft.setTextColor(TFT_WHITE);
-    tft.drawString("Connecting Wi-Fi...", 10, 10);
+    tft.setTextColor(ST77XX_WHITE);
+    tft.setCursor(10, 10);
+    tft.print("Connecting Wi-Fi...");
     
     while (WiFi.status() != WL_CONNECTED) {
         delay(500);
         Serial.print(".");
     }
     Serial.println("\nConnected!");
-    tft.fillScreen(TFT_BLACK);
+    tft.fillScreen(ST77XX_BLACK);
     
     timeClient.begin();
     timeClient.update();
@@ -88,7 +91,7 @@ void ensureConnected() {
 int pngDraw(PNGDRAW *pDraw) {
     uint16_t lineBuffer[160];
     png.getLineAsRGB565(pDraw, lineBuffer, PNG_RGB565_BIG_ENDIAN, 0xffffffff);
-    tft.pushImage(0, pDraw->y, pDraw->iWidth, 1, lineBuffer);
+    tft.drawRGBBitmap(0, pDraw->y, lineBuffer, pDraw->iWidth, 1);
     return 0;
 }
 
@@ -108,9 +111,7 @@ bool drawFrame(String filename) {
     
     int rc = png.openRAM(buffer, size, pngDraw);
     if (rc == PNG_SUCCESS) {
-        tft.startWrite();
         png.decode(NULL, 0);
-        tft.endWrite();
         png.close();
     }
     free(buffer);
