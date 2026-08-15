@@ -27,7 +27,7 @@ void ensureConnected();
 bool downloadAnimation(String animName);
 void playNextFrame();
 void updateBehavior();
-void pngDraw(PNGDRAW *pDraw);
+int pngDraw(PNGDRAW *pDraw);
 
 void setup() {
     Serial.begin(115200);
@@ -85,10 +85,11 @@ void ensureConnected() {
 }
 
 // Draw callback for PNGdec
-void pngDraw(PNGDRAW *pDraw) {
+int pngDraw(PNGDRAW *pDraw) {
     uint16_t lineBuffer[160];
     png.getLineAsRGB565(pDraw, lineBuffer, PNG_RGB565_BIG_ENDIAN, 0xffffffff);
     tft.pushImage(0, pDraw->y, pDraw->iWidth, 1, lineBuffer);
+    return 0;
 }
 
 // Draw from a LittleFS file directly to TFT
