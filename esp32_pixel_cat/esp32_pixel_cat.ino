@@ -6,6 +6,9 @@
 #include "config.h"
 #include "frames.h"
 
+// Forward declaration to prevent Arduino IDE compile errors
+int pngDraw(PNGDRAW *pDraw);
+
 Adafruit_ST7735 tft = Adafruit_ST7735(TFT_CS, TFT_DC, TFT_RST);
 PNG png;
 
