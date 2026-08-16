@@ -9,7 +9,9 @@
 // Forward declaration to prevent Arduino IDE compile errors
 int pngDraw(PNGDRAW *pDraw);
 
-Adafruit_ST7735 tft = Adafruit_ST7735(TFT_CS, TFT_DC, TFT_RST);
+// Use software SPI with all pins explicitly defined
+// (CS, DC, MOSI, SCLK, RST)
+Adafruit_ST7735 tft = Adafruit_ST7735(TFT_CS, TFT_DC, 23, 18, TFT_RST);
 PNG png;
 
 int currentFrameIndex = 0;
