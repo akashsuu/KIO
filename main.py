@@ -21,7 +21,7 @@ class KioCat(QWidget):
         # Timers
         self.anim_timer = QTimer(self)
         self.anim_timer.timeout.connect(self.update_animation)
-        self.anim_timer.start(150) # ~6-7 fps for a relaxed cat feel
+        self.anim_timer.start(200) # ~5 fps for a slower, more relaxed cat feel
         
         self.behavior_timer = QTimer(self)
         self.behavior_timer.timeout.connect(self.update_behavior)
@@ -99,12 +99,13 @@ class KioCat(QWidget):
             pet_w = self.animations["sit"][0].width()
             pet_h = self.animations["sit"][0].height()
         
-        ground_y = screen.bottom() - pet_h
+        y_offset = 53
+        ground_y = screen.bottom() - pet_h + y_offset
         
         if taskbar:
             # If taskbar is on the bottom
             if taskbar.bottom() == screen.bottom() and taskbar.width() == screen.width():
-                ground_y = taskbar.top() - pet_h
+                ground_y = taskbar.top() - pet_h + y_offset
         
         x = random.randint(0, screen.width() - pet_w)
         self.move(x, ground_y)
@@ -191,7 +192,7 @@ class KioCat(QWidget):
         taskbar = self.get_taskbar_rect()
         
         # Define ground level (with a visual offset to push it ~2cm down)
-        y_offset = 75
+        y_offset = 53
         ground_y = screen.bottom() - self.height() + y_offset
         
         # Determine if we are above the taskbar
