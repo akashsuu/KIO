@@ -10,13 +10,16 @@ class KioCat(QWidget):
     def __init__(self):
         super().__init__()
         
-        self.initUI()
-        self.loadAnimations()
-        
-        # State machine
+        # State machine initialization
         self.state = "sit"
+        self.next_state = None
         self.direction = 1 # 1 for right, -1 for left
         self.frame_index = 0
+        self.velocity_x = 0
+        self.velocity_y = 0
+
+        self.initUI()
+        self.loadAnimations()
         
         # Timers
         self.anim_timer = QTimer(self)
@@ -34,9 +37,6 @@ class KioCat(QWidget):
         # Position and physics
         self.is_dragging = False
         self.drag_offset = QPoint()
-        
-        self.velocity_x = 0
-        self.velocity_y = 0
         
         self.place_randomly()
 
@@ -75,6 +75,7 @@ class KioCat(QWidget):
             self.behavior_timer.stop()
             self.move_timer.stop()
             self.state = "sit"
+            self.next_state = None
         else:
             self.pause_action.setText("Pause")
             self.behavior_timer.start(3000)
@@ -151,11 +152,30 @@ class KioCat(QWidget):
             anim_state = list(self.animations.keys())[0]
             
         frames = self.animations[anim_state]
-        self.frame_index = (self.frame_index + 1) % len(frames)
+        self.frame_index += 1
         
+        # Check if we finished the animation loop
+        if self.frame_index >= len(frames):
+            if self.next_state:
+                # Transition to next state
+                self.state = self.next_state
+                self.next_state = None
+                self.frame_index = 0
+                
+                # Re-evaluate anim_state with new state
+                anim_state = self.state if self.state in self.animations else "sit"
+                if anim_state not in self.animations:
+                    anim_state = list(self.animations.keys())[0]
+                frames = self.animations[anim_state]
+            else:
+                self.frame_index = 0
+        
+        # Bound frame index just in case
+        self.frame_index = self.frame_index % len(frames)
         pixmap = frames[self.frame_index]
-        if self.direction == -1:
-            # Flip horizontally
+        
+        if self.direction == 1:
+            # Flip horizontally (since the default frames face left)
             transform = QTransform().scale(-1, 1)
             pixmap = pixmap.transformed(transform)
             
@@ -165,24 +185,44 @@ class KioCat(QWidget):
         if self.is_dragging or self.is_paused:
             return
             
-        # Behavior choices
-        choices = ["sit", "walk", "turn", "pause", "look_around"]
-        weights = [0.4, 0.3, 0.1, 0.1, 0.1]
-        
-        self.state = random.choices(choices, weights=weights)[0]
-        
-        if self.state == "turn":
-            self.direction *= -1
-            self.state = "sit" # Transition to sit after turning
-            self.velocity_x = 0
-        elif self.state == "walk":
-            # Give a slow, relaxed walking speed
-            self.velocity_x = random.randint(1, 3) * self.direction
-        else:
-            self.velocity_x = 0
+        # Don't interrupt a transition
+        if self.next_state:
+            return
             
-        # Randomize timer for next behavior (2 to 6 seconds)
-        self.behavior_timer.setInterval(random.randint(2000, 6000))
+        choices = ["sit", "walk", "stand", "turn"]
+        weights = [0.3, 0.4, 0.2, 0.1]
+        
+        new_intent = random.choices(choices, weights=weights)[0]
+        
+        if new_intent == "turn":
+            self.direction *= -1
+            # Decide to walk or stand after turning
+            new_intent = random.choice(["walk", "stand", "sit"])
+            
+        current_is_sitting = (self.state == "sit")
+        wants_to_stand = (new_intent in ["walk", "stand"])
+        
+        if current_is_sitting and wants_to_stand:
+            self.state = "sit_to_standup"
+            self.next_state = new_intent
+            self.frame_index = 0
+        elif not current_is_sitting and new_intent == "sit":
+            self.state = "standup_to_sit"
+            self.next_state = "sit"
+            self.frame_index = 0
+        else:
+            # Direct switch (e.g. stand to walk, walk to stand)
+            self.state = new_intent
+            if self.state not in self.animations:
+                self.state = "sit" # safe fallback
+            self.frame_index = 0
+            
+        # Always randomize a new walking speed when intending to walk
+        if new_intent == "walk" or self.next_state == "walk":
+            self.velocity_x = random.randint(1, 3) * self.direction
+            
+        # Randomize timer for next behavior (3 to 7 seconds)
+        self.behavior_timer.setInterval(random.randint(3000, 7000))
 
     def update_position(self):
         if self.is_dragging or self.is_paused:
@@ -210,7 +250,12 @@ class KioCat(QWidget):
             self.velocity_y = 0
             self.move(self.x(), ground_y)
             
-        new_x = self.x() + self.velocity_x
+        # Only apply X velocity if actually in the "walk" state
+        if self.state == "walk":
+            new_x = self.x() + self.velocity_x
+        else:
+            new_x = self.x()
+            
         new_y = self.y() + self.velocity_y
         
         # Screen edge collisions
@@ -235,8 +280,9 @@ class KioCat(QWidget):
             # Record offset for smooth dragging
             self.drag_offset = event.globalPosition().toPoint() - self.pos()
             
-            # Cat is picked up
-            self.state = "sit"
+            # Cat is picked up, let's dangle it (or just use stand)
+            self.state = "stand"
+            self.next_state = None
             self.velocity_x = 0
             self.velocity_y = 0
             
