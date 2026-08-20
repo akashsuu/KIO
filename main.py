@@ -2,6 +2,7 @@ import sys
 import os
 import random
 import win32gui
+import win32con
 from PyQt6.QtWidgets import QApplication, QWidget, QLabel, QMenu, QSystemTrayIcon
 from PyQt6.QtCore import Qt, QTimer, QPoint, QRect
 from PyQt6.QtGui import QPixmap, QIcon, QAction, QTransform
@@ -181,7 +182,13 @@ class KioCat(QWidget):
             
         self.label.setPixmap(pixmap)
 
+    def ensure_topmost(self):
+        hwnd = int(self.winId())
+        win32gui.SetWindowPos(hwnd, win32con.HWND_TOPMOST, 0, 0, 0, 0,
+                              win32con.SWP_NOMOVE | win32con.SWP_NOSIZE | win32con.SWP_NOACTIVATE)
+
     def update_behavior(self):
+        self.ensure_topmost()
         if self.is_dragging or self.is_paused:
             return
             
