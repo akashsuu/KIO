@@ -25,7 +25,7 @@ class KioCat(QWidget):
         # Timers
         self.anim_timer = QTimer(self)
         self.anim_timer.timeout.connect(self.update_animation)
-        self.anim_timer.start(200) # ~5 fps for a slower, more relaxed cat feel
+        self.anim_timer.start(250) # ~4 fps for a slower, more relaxed cat feel
         
         self.behavior_timer = QTimer(self)
         self.behavior_timer.timeout.connect(self.update_behavior)
