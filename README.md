@@ -1,6 +1,6 @@
-# 🐱 Kio Cat
+# Kio Cat
 
-**Your new digital companion that's always got your back (or in front of your face)!**
+Your new digital companion that's always got your back (or in front of your face)!
 
 ---
 
@@ -10,19 +10,19 @@ Kio Cat is a delightful desktop pet built with PyQt6 that roams around your scre
 
 ---
 
-## ✨ Features
+## Features
 
 | Feature | Description |
 |---------|-------------|
-| 🎭 **Animated States** | Sit, walk, stand, turn, and smooth transitions between them |
-| 🌐 **Screen Navigation** | Walks around, avoids your taskbar, and bounces off screen edges |
-| 🖱️ **Interactive** | Left-click & drag to move, right-click for the tray menu |
-| 📋 **System Tray** | Minimize to tray, pause/resume, exit from the icon menu |
-| 🧱 **Smart Ground** | Automatically walks "above" the taskbar, never gets stuck |
+| **Animated States** | Sit, walk, stand, turn, and smooth transitions between them |
+| **Screen Navigation** | Walks around, avoids your taskbar, and bounces off screen edges |
+| **Interactive** | Left-click & drag to move, right-click for the tray menu |
+| **System Tray** | Minimize to tray, pause/resume, exit from the icon menu |
+| **Smart Ground** | Automatically walks "above" the taskbar, never gets stuck |
 
 ---
 
-## 🚀 Quick Start
+## Quick Start
 
 ```bash
 # 1. Install
@@ -40,7 +40,7 @@ The cat will appear on your screen. Here's how to interact with it:
 
 ---
 
-## 🛠️ Requirements
+## Requirements
 
 - Python 3.8+
 - [PyQt6](https://pypi.org/project/PyQt6/) >= 6.5.0
@@ -48,7 +48,7 @@ The cat will appear on your screen. Here's how to interact with it:
 
 ---
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 kio_cat/          # Animation frames
@@ -64,7 +64,7 @@ requirements.txt  # Python dependencies
 
 ---
 
-## 🐾 States & Behavior
+## States & Behavior
 
 The cat's state machine decides what it does every few seconds:
 
@@ -77,21 +77,20 @@ When it transitions between sitting and standing, you'll see smooth animation se
 
 ---
 
-## 🛸 Fun Facts
+## Fun Facts
 
 - The cat respects your taskbar and walks *above* it
 - Drag the cat anywhere on screen – it'll remember the spot
 - Right-click the tray icon for quick controls
-- Press `Win+R`, type `main.py`, press Enter... okay maybe don't do that
 
 ---
 
-## 🛠️ Building / Customizing
+## Building / Customizing
 
 Want to add more animations or modify behavior? The code is heavily commented and the state machine is in `main.py`. Animation frames go in `kio_cat/<state>/` as PNG files.
 
 ---
 
-**Made with ❤️ using PyQt6**
+**Made with PyQt6**
 
 *May your cat always land on its feet (and stay on top of your windows).*
